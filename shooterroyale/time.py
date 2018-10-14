@@ -1,7 +1,7 @@
 '''
 time.py
 
-Modules that contains time related classes, like Timer for example.
+Module that contains time related classes, like Timer for example.
 '''
 import time
 
