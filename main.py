@@ -25,6 +25,9 @@ def main():
                 done = True
 
         display.fill((30, 30, 30))
+
+        display.blit(sheet.get_tile(3, 2), (0, 0))
+
         pg.display.update()
         clock.tick(60)
 
