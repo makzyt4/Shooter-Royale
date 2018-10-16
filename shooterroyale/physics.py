@@ -9,13 +9,12 @@ class Entity:
         self._joints = []
         self.wireframe_color = (255, 0, 0)
         self.image = None
-        self.shape_filter = pm.ShapeFilter(group=0)
+        self.shape_filter = pm.ShapeFilter(group=1)
 
     def add_element(self, position, size, mass, rect=None):
         body = pm.Body(mass)
         body.position = position
         body.moment = pm.moment_for_box(mass, size) * 5
-        print(body.moment)
 
         if rect is None:
             img = None
@@ -33,7 +32,6 @@ class Entity:
 
     def add_to_space(self, space):
         for elem in self._elements:
-            print(*elem[:2])
             space.add(*elem[:2])
         space.add(*self._joints)
 
@@ -58,7 +56,6 @@ class Entity:
 
             img = pg.transform.rotate(elem[4], -math.degrees(elem[0].angle))
             offset = pm.Vec2d(img.get_size()) / 2
-            print(offset)
             pos -= offset
             surface.blit(img, (pos[0], pos[1]))
 
@@ -74,6 +71,7 @@ class StaticBody(Entity):
         self.add_element(self.position, self.size, 100.0)
         self._elements[-1][0].body_type = pm.Body.STATIC
 
+        self._elements[-1][1].filter = pm.ShapeFilter(group=2)
 
 class Ragdoll(Entity):
     def __init__(self, position):
@@ -82,4 +80,78 @@ class Ragdoll(Entity):
         self.image = pg.image.load('./resources/player_m_rbody.png')
 
     def load_elements(self):
-        self.add_element(self.position, (22, 20), 60.0, pg.Rect(62, 32, 22, 20))
+        self.add_element(self.position, (22, 20), 60.0, pg.Rect(58, 32, 30, 25))
+        self.add_element(self.position + pm.Vec2d(0, -14), (12, 12), 4.0,
+                         pg.Rect(58, 106, 12, 12))
+
+        self.add_element(self.position + pm.Vec2d(-11, -8), (11, 7), 2.0,
+                         pg.Rect(85, 20, 11, 7))
+        self.add_element(self.position + pm.Vec2d(-19, -8), (14, 8), 2.0,
+                         pg.Rect(71, 19, 14, 8))
+        self.add_element(self.position + pm.Vec2d(-6, 14), (11, 12), 8.0,
+                         pg.Rect(181, 64, 11, 12))
+        self.add_element(self.position + pm.Vec2d(-5, 25), (11, 12), 4.0,
+                         pg.Rect(181, 76, 11, 12))
+
+        self.add_element(self.position + pm.Vec2d(11, -8), (11, 7), 2.0,
+                         pg.Rect(160, 20, 11, 7))
+        self.add_element(self.position + pm.Vec2d(19, -8), (14, 8), 2.0,
+                         pg.Rect(171, 19, 14, 8))
+        self.add_element(self.position + pm.Vec2d(6, 14), (11, 12), 8.0,
+                         pg.Rect(64, 64, 11, 12))
+        self.add_element(self.position + pm.Vec2d(5, 25), (11, 12), 4.0,
+                         pg.Rect(64, 76, 11, 12))
+
+        self.add_joint(pm.PivotJoint(self._elements[0][0], self._elements[1][0],
+                                     self.position + pm.Vec2d(0, -11)))
+        self.add_joint(pm.PivotJoint(self._elements[0][0], self._elements[1][0],
+                                     self._elements[0][0].position +
+                                     pm.Vec2d(0, -15)))
+
+        self.add_joint(pm.PivotJoint(self._elements[0][0], self._elements[2][0],
+                                     self.position + pm.Vec2d(-10, -7)))
+        self.add_joint(pm.RotaryLimitJoint(self._elements[0][0],
+                                           self._elements[2][0],
+                                           math.radians(-90), math.radians(90)))
+
+        self.add_joint(pm.PivotJoint(self._elements[2][0], self._elements[3][0],
+                                     self.position + pm.Vec2d(-16, -11)))
+        self.add_joint(pm.RotaryLimitJoint(self._elements[2][0],
+                                           self._elements[3][0],
+                                           math.radians(0), math.radians(110)))
+
+        self.add_joint(pm.PivotJoint(self._elements[0][0], self._elements[4][0],
+                                     self.position + pm.Vec2d(-5, 10)))
+        self.add_joint(pm.RotaryLimitJoint(self._elements[0][0],
+                                           self._elements[4][0],
+                                           math.radians(0), math.radians(90)))
+
+        self.add_joint(pm.PivotJoint(self._elements[4][0], self._elements[5][0],
+                                     self.position + pm.Vec2d(-4, 18)))
+        self.add_joint(pm.RotaryLimitJoint(self._elements[4][0],
+                                           self._elements[5][0],
+                                           math.radians(-110), math.radians(0)))
+
+        self.add_joint(pm.PivotJoint(self._elements[0][0], self._elements[6][0],
+                                     self.position + pm.Vec2d(10, -7)))
+        self.add_joint(pm.RotaryLimitJoint(self._elements[0][0],
+                                           self._elements[6][0],
+                                           math.radians(-90), math.radians(90)))
+
+        self.add_joint(pm.PivotJoint(self._elements[6][0], self._elements[7][0],
+                                     self.position + pm.Vec2d(16, -8)))
+        self.add_joint(pm.RotaryLimitJoint(self._elements[6][0],
+                                           self._elements[7][0],
+                                           math.radians(-110), math.radians(0)))
+
+        self.add_joint(pm.PivotJoint(self._elements[0][0], self._elements[8][0],
+                                     self.position + pm.Vec2d(5, 10)))
+        self.add_joint(pm.RotaryLimitJoint(self._elements[0][0],
+                                           self._elements[8][0],
+                                           math.radians(-90), math.radians(0)))
+
+        self.add_joint(pm.PivotJoint(self._elements[8][0], self._elements[9][0],
+                                     self.position + pm.Vec2d(4, 18)))
+        self.add_joint(pm.RotaryLimitJoint(self._elements[8][0],
+                                           self._elements[9][0],
+                                           math.radians(0), math.radians(110)))

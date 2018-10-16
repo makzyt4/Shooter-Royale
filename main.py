@@ -17,6 +17,7 @@ def main():
 
     rds = []
     sbs = []
+    phantom_rect = None
 
     done = False
 
@@ -24,13 +25,16 @@ def main():
         for event in pg.event.get():
             mouse = pm.Vec2d(pg.mouse.get_pos())
 
-            if event.type == pg.MOUSEBUTTONDOWN:
+            if event.type == pg.MOUSEMOTION and points[0] is not None:
+                points[1] = mouse
+                phantom_rect = pg.Rect(points[0], points[1] - points[0])
+            elif event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     ragdoll = sr_p.Ragdoll(mouse)
                     ragdoll.load_elements()
                     ragdoll.add_to_space(space)
                     rds.append(ragdoll)
-                elif event.button == 3:
+                elif event.button == 3 and points[0] is None:
                     points[0] = mouse
             elif event.type == pg.MOUSEBUTTONUP:
                 if event.button == 3:
@@ -40,18 +44,8 @@ def main():
                     sb.load_elements()
                     sb.add_to_space(space)
                     sbs.append(sb)
-                    points = [None, None]
-
-            elif event.type == pg.MOUSEMOTION and points[0] is not None:
-                points[1] = mouse
-                rect = pg.Rect(points[0], points[1] - points[0])
-                vertices = ((rect.left, rect.top),
-                            (rect.left + rect.width, rect.top),
-                            (rect.left + rect.width, rect.top + rect.height),
-                            (rect.left, rect.top + rect.height),
-                            (rect.left, rect.top))
-                pg.draw.lines(display, (0, 128, 0), False, vertices)
-
+                phantom_rect = None
+                points = [None, None]
             elif event.type == pg.QUIT:
                 done = True
 
@@ -59,9 +53,18 @@ def main():
 
         for rd in rds:
             rd.draw(display)
-            rd.draw_wireframe(display)
+            #rd.draw_wireframe(display)
         for sb in sbs:
             sb.draw_wireframe(display)
+
+        if phantom_rect is not None:
+            x, y, w, h = (phantom_rect.left, phantom_rect.top,
+                          phantom_rect.width, phantom_rect.height)
+            vertices = (pm.Vec2d(x, y),
+                        pm.Vec2d(x + w, y),
+                        pm.Vec2d(x + w, y + h),
+                        pm.Vec2d(x, y + h))
+            pg.draw.lines(display, (0, 255, 0), True, vertices)
 
         pg.display.update()
         clock.tick(60)
