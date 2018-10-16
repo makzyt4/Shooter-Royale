@@ -1,4 +1,5 @@
 import pygame as pg
+import shooterroyale.time as sr_t
 
 
 class Sheet:
@@ -21,3 +22,43 @@ class Sheet:
 
     def get_tile(self, index_x, index_y):
         return self.__tiles[index_x][index_y].copy()
+
+
+class Animation:
+    def __init__(self, frames, frame_time, play=True):
+        self.frames = frames
+        self.frame_time = frame_time
+        self.timer = sr_t.Timer(play)
+        self.__current_frame_index = 0
+
+    def get_current_frame(self):
+        return self.frames[self.__current_frame_index]
+
+    def update(self):
+        self.timer.update()
+
+        if self.timer.elapsed_time() > self.frame_time:
+            self.__current_frame_index += 1
+            self.__current_frame_index %= len(self.frames)
+            self.timer.restart()
+
+    def is_paused(self):
+        return self.timer.is_paused()
+
+    def elapsed_time(self):
+        return self.timer.elapsed_time()
+
+    def restart(self):
+        self.timer.restart()
+
+    def pause(self):
+        self.timer.pause()
+
+    def resume(self):
+        self.timer.resume()
+
+    def start(self):
+        self.timer.start()
+
+    def stop(self):
+        self.timer.stop()
