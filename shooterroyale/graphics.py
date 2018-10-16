@@ -1,15 +1,7 @@
-'''
-graphics.py
-
-Module that contains graphics related classes.
-'''
 import pygame as pg
 
 
 class Sheet:
-    '''
-    Loads a sheet and converts it into an array of tiles.
-    '''
     def __init__(self, tile_size=(32, 32), image=None):
         self.__tiles = []
         self.tile_size = tile_size
