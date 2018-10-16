@@ -73,6 +73,7 @@ class StaticBody(Entity):
 
         self._elements[-1][1].filter = pm.ShapeFilter(group=2)
 
+
 class Ragdoll(Entity):
     def __init__(self, position):
         super().__init__()
@@ -155,3 +156,14 @@ class Ragdoll(Entity):
         self.add_joint(pm.RotaryLimitJoint(self._elements[8][0],
                                            self._elements[9][0],
                                            math.radians(0), math.radians(110)))
+
+
+class BulletBody(Entity):
+    def __init__(self, position, velocity):
+        super().__init__()
+        self.velocity = velocity
+        self.add_element(position, (3,3), 1.0, None)
+
+    def load_elements(self):
+        self._elements[-1][1].filter = pm.ShapeFilter(group=3)
+        self._elements[-1][0].apply_force_at_local_point(self.velocity, (0, 0))

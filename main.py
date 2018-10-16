@@ -7,8 +7,8 @@ def main():
     points = [None, None]
 
     space = pm.Space()
-    space.gravity = (0, 1000)
-    space.damping = 0.7
+    space.gravity = (0, 0)
+    #space.damping = 0.01
 
     pg.init()
     screen_size = (800, 600)
@@ -17,11 +17,19 @@ def main():
 
     rds = []
     sbs = []
+    bts = []
     phantom_rect = None
 
     done = False
+    gravity = False
+    wireframe = False
 
     while not done:
+        if gravity:
+            space.gravity = (0, 1000)
+        else:
+            space.gravity = (0, 0)
+
         for event in pg.event.get():
             mouse = pm.Vec2d(pg.mouse.get_pos())
 
@@ -34,6 +42,11 @@ def main():
                     ragdoll.load_elements()
                     ragdoll.add_to_space(space)
                     rds.append(ragdoll)
+                elif event.button == 2:
+                    bullet = sr_p.BulletBody(mouse, (-100000, -100000))
+                    bullet.load_elements()
+                    bullet.add_to_space(space)
+                    bts.append(bullet)
                 elif event.button == 3 and points[0] is None:
                     points[0] = mouse
             elif event.type == pg.MOUSEBUTTONUP:
@@ -46,6 +59,11 @@ def main():
                     sbs.append(sb)
                 phantom_rect = None
                 points = [None, None]
+            elif event.type == pg.KEYDOWN:
+                if event.key == ord('g'):
+                    gravity ^= True
+                elif event.key == ord('w'):
+                    wireframe ^= True
             elif event.type == pg.QUIT:
                 done = True
 
@@ -53,9 +71,12 @@ def main():
 
         for rd in rds:
             rd.draw(display)
-            #rd.draw_wireframe(display)
+            if wireframe:
+                rd.draw_wireframe(display)
         for sb in sbs:
             sb.draw_wireframe(display)
+        for bt in bts:
+            bt.draw_wireframe(display)
 
         if phantom_rect is not None:
             x, y, w, h = (phantom_rect.left, phantom_rect.top,
